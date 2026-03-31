@@ -5,7 +5,6 @@ from app.main import app
 
 client = TestClient(app)
 
-@pytest.mark.xfail(reason="TODO: Health endpoint not implemented yet")
 def test_health_endpoint():
     response = client.get("/api/health")
 
