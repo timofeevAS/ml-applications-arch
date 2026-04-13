@@ -1,3 +1,5 @@
+import time
+
 from deduplicator import InMemoryDeduplicator
 from publisher.stdout import StdoutPublisher
 from runner import IngestionRunner
@@ -13,7 +15,17 @@ def main() -> None:
         deduplicator=InMemoryDeduplicator(),
     )
 
-    runner.run_once()
+    fetch_interval = 20 # 20 seconds
+
+    while True:
+        start = time.time()
+
+        runner.run_once()
+        
+        # A fair way to calculate latency, taking pipeline delay into account.
+        elapsed = time.time() - start
+        sleep_time = max(0, fetch_interval - elapsed)
+        time.sleep(sleep_time)
 
 
 if __name__ == "__main__":
