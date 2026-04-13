@@ -6,6 +6,7 @@ from sources.digitraffic import DigitrafficSensorValue, DigitrafficSource, Digit
 from transformers.base import Measurment
 from transformers.digitraffic import DigitrafficTransformer
 
+@pytest.mark.external
 def test_digitraffic_fetch_smoke():
     source = DigitrafficSource()
     data = source.fetch()
