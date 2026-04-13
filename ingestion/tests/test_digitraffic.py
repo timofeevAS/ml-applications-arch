@@ -8,7 +8,7 @@ from transformers.digitraffic import DigitrafficTransformer
 
 @pytest.mark.external
 def test_digitraffic_fetch_smoke():
-    source = DigitrafficSource()
+    source = DigitrafficSource(station_ids=[20002])
     data = source.fetch()
     
     assert len(data) > 0
