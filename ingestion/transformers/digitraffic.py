@@ -1,19 +1,17 @@
-from sources.digitraffic import DigitrafficStationData
+from sources.digitraffic import DigitrafficTrafficFlowHourlySensor
 from transformers.base import Measurment, Transformer
 
 
 class DigitrafficTransformer(Transformer):
-    def transform(self, digitraffic_data: DigitrafficStationData) -> list[Measurment]:
+    def transform(self, digitraffic_data: list[DigitrafficTrafficFlowHourlySensor]) -> list[Measurment]:
         result: list[Measurment] = []
-        for sv in digitraffic_data.sensor_values:
+        for sv in digitraffic_data:
             measurment = Measurment(
-                sensor_id=f"{digitraffic_data.station_id}:{sv.id}",
+                sensor_id=f"DIGITRAFFIC:{sv.station_id}",
                 timestamp=sv.measured_time,
-                value=sv.value,
+                value=sv.sensor_value,
                 value_metadata = {
-                    "unit" : sv.unit,
-                    "time_window_start" : sv.time_window_start,
-                    "time_window_end" : sv.time_window_end
+                    "unit" : sv.unit
                     }
                 )
             
