@@ -60,6 +60,14 @@ def test_digitraffic_transform():
     assert result[1].value_metadata["time_window_start"] == "2026-04-10T20:45:00Z"
     assert result[1].value_metadata["time_window_end"] == "2026-04-10T20:50:00Z"
 
+def test_digitraffic_transform_empty():
+    transformer = DigitrafficTransformer()
+
+    result = transformer.transform(
+        DigitrafficStationData(station_id=20002, sensor_values=[])
+    )
+
+    assert result == []
 
 def test_digitraffic_stddout_publisher(capsys):
     publisher = StdoutPublisher()
