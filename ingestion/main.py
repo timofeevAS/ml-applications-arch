@@ -20,7 +20,10 @@ def main() -> None:
     while True:
         start = time.time()
 
-        runner.run_once()
+        try:
+            runner.run_once()
+        except Exception as e:
+            print(f"[Runner] error: {e}")
         
         # A fair way to calculate latency, taking pipeline delay into account.
         elapsed = time.time() - start
