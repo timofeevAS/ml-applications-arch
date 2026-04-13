@@ -6,12 +6,20 @@ from sources.digitraffic import DigitrafficSource, DigitrafficTrafficFlowHourlyS
 from transformers.base import Measurment
 from transformers.digitraffic import DigitrafficTransformer
 
+@pytest.mark.parametrize(
+    "station_ids, expected_len",
+    [
+        ([], 0),
+        ([20002], 1),
+        ([20002, 23001], 2),
+    ],
+)
 @pytest.mark.external
-def test_digitraffic_fetch_smoke():
-    source = DigitrafficSource(station_ids=[20002])
+def test_digitraffic_fetch_smoke(station_ids, expected_len):
+    source = DigitrafficSource(station_ids=station_ids)
     data = source.fetch()
-    
-    assert len(data) > 0
+
+    assert len(data) == expected_len
 
 def test_digitraffic_transform():
     transformer = DigitrafficTransformer()
