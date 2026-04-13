@@ -1,5 +1,9 @@
+import json
+
 import pytest
+from publisher.stdout import StdoutPublisher
 from sources.digitraffic import DigitrafficSensorValue, DigitrafficSource, DigitrafficStationData
+from transformers.base import Measurment
 from transformers.digitraffic import DigitrafficTransformer
 
 def test_digitraffic_fetch_smoke():
@@ -55,3 +59,32 @@ def test_digitraffic_transform():
     assert result[1].value_metadata["unit"] == "kpl/h"
     assert result[1].value_metadata["time_window_start"] == "2026-04-10T20:45:00Z"
     assert result[1].value_metadata["time_window_end"] == "2026-04-10T20:50:00Z"
+
+
+def test_digitraffic_stddout_publisher(capsys):
+    publisher = StdoutPublisher()
+
+    publisher.publish(
+        [
+            Measurment(
+                sensor_id="20002:5080",
+                timestamp="2026-04-10T20:52:03Z",
+                value=312.0,
+                value_metadata={"unit": "kpl/h",
+                                "time_window_start" : "2026-04-10T20:45:00Z",
+                                "time_window_end" : "2026-04-10T20:50:00Z"},
+            )
+        ]
+    )
+
+    captured = capsys.readouterr()
+
+    # parse output as JSON
+    output = json.loads(captured.out.strip())
+
+    assert output["sensor_id"] == "20002:5080"
+    assert output["timestamp"] == "2026-04-10T20:52:03Z"
+    assert output["value"] == 312.0
+    assert output["value_metadata"]["unit"] == "kpl/h"
+    assert output["value_metadata"]["time_window_start"] == "2026-04-10T20:45:00Z"
+    assert output["value_metadata"]["time_window_end"] == "2026-04-10T20:50:00Z"
