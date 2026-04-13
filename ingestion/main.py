@@ -5,6 +5,7 @@ from publisher.stdout import StdoutPublisher
 from runner import IngestionRunner
 from sources.digitraffic import DigitrafficSource
 from transformers.digitraffic import DigitrafficTransformer
+from settings import settings
 
 
 def main() -> None:
@@ -15,7 +16,8 @@ def main() -> None:
         deduplicator=InMemoryDeduplicator(),
     )
 
-    fetch_interval = 20 # 20 seconds
+    # Using .env variable.
+    fetch_interval = settings.polling_seconds_timeout
 
     while True:
         start = time.time()
