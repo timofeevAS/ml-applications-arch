@@ -42,4 +42,4 @@ def test_runner_run_once_empty_mesurements():
     result = runner.run_once()
 
     assert result == []
-    assert publisher.published == None # Ingestion runner ignore empty measurements lists
+    assert publisher.published is None # Ingestion runner ignore empty measurements lists
