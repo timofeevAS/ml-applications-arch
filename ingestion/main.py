@@ -9,10 +9,8 @@ from settings import settings
 
 
 def main() -> None:
-    STATION_IDS=[20002]
-
     runner = IngestionRunner(
-        source=DigitrafficSource(station_ids=STATION_IDS),
+        source=DigitrafficSource(station_ids=settings.digitraffic_stations_ids),
         transformer=DigitrafficTransformer(),
         publisher=StdoutPublisher(),
         deduplicator=InMemoryDeduplicator(),
