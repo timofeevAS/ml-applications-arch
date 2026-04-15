@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: ["main", "K2", "K5", "K9", "K5-2"]
   pull_request:
-    branches: ["main"]
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
@@ -28,7 +28,7 @@ jobs:
       - name: Lint with Ruff
         run: python -m ruff check general
 
-  test:
+  general-tests:
     needs: lint
     runs-on: ubuntu-latest
 
@@ -41,10 +41,10 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install dependencies
+      - name: Install pytest
         run: |
           python -m pip install --upgrade pip
           pip install pytest
 
       - name: Run tests
-        run: python -m pytest general/tests/test_sum.py
+        run: python -m pytest general/tests/
