@@ -70,6 +70,4 @@ jobs:
 
       - name: Run tests
         working-directory: backend
-        env:
-          PYTHONPATH: src
         run: python -m pytest tests/
