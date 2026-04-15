@@ -26,7 +26,7 @@ jobs:
           pip install ruff
 
       - name: Lint with Ruff
-        run: python -m ruff check general
+        run: python -m ruff check general backend
 
   general-tests:
     needs: lint
