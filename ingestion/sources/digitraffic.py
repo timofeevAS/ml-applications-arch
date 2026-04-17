@@ -2,13 +2,16 @@ from dataclasses import dataclass
 import re
 
 import requests
+from datetime import datetime
+
 from .base import Source
+
 
 @dataclass(slots=True)
 class DigitrafficTrafficFlowHourlySensor:
     station_id: int
     sensor_value: int
-    measured_time: str # TODO: datetime?
+    measured_time: datetime
     unit: str
 
 class DigitrafficSource(Source):
