@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
+from datetime import datetime
 from typing import Any
 
 class Transformer(ABC):
@@ -10,6 +11,6 @@ class Transformer(ABC):
 @dataclass(slots=True)
 class Measurment:
     sensor_id: str
-    timestamp: str
+    timestamp: datetime
     value: float | int | None
     value_metadata: dict[str, Any] = field(default_factory=dict)
