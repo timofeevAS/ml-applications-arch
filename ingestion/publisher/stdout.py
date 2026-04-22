@@ -8,4 +8,4 @@ from transformers.base import Measurment
 class StdoutPublisher(Publisher):
     def publish(self, data: list[Measurment]) -> None:
         for item in data:
-            print(json.dumps(asdict(item)))
+            print(json.dumps(asdict(item), default=str, ensure_ascii=False))

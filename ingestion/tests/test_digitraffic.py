@@ -95,8 +95,6 @@ def test_digitraffic_stddout_publisher(capsys):
     
 def write_csv(path: Path, lines: list[str]) -> None:
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
-
-
 def test_init_raises_when_csv_paths_empty() -> None:
     with pytest.raises(ValueError, match="csv_paths"):
         DigitrafficHistoryReplaySource(
@@ -124,7 +122,7 @@ def test_parse_raw_line_returns_sensor(tmp_path: Path) -> None:
     )
 
 
-def test_fetch_returns_shifted_first_event(tmp_path: Path) -> None:
+def test_fetch_returns_batch_for_single_station(tmp_path: Path) -> None:
     csv_path = tmp_path / "station.csv"
     write_csv(
         csv_path,
@@ -140,17 +138,19 @@ def test_fetch_returns_shifted_first_event(tmp_path: Path) -> None:
         csv_paths={1: csv_path},
     )
 
-    event = source.fetch()
+    events = source.fetch()
 
-    assert event == DigitrafficTrafficFlowHourlySensor(
-        station_id=1,
-        sensor_value=4,
-        measured_time=replay_start,
-        unit="veh/h",
-    )
+    assert events == [
+        DigitrafficTrafficFlowHourlySensor(
+            station_id=1,
+            sensor_value=4,
+            measured_time=replay_start,
+            unit="veh/h",
+        )
+    ]
 
 
-def test_fetch_preserves_relative_time_offset(tmp_path: Path) -> None:
+def test_fetch_preserves_relative_time_offset_between_calls(tmp_path: Path) -> None:
     csv_path = tmp_path / "station.csv"
     write_csv(
         csv_path,
@@ -167,18 +167,19 @@ def test_fetch_preserves_relative_time_offset(tmp_path: Path) -> None:
         csv_paths={1: csv_path},
     )
 
-    first = source.fetch()
-    second = source.fetch()
+    first_batch = source.fetch()
+    second_batch = source.fetch()
 
-    assert first is not None
-    assert second is not None
-    assert first.measured_time == replay_start
-    assert second.measured_time == replay_start + timedelta(minutes=5)
-    assert first.sensor_value == 10
-    assert second.sensor_value == 20
+    assert len(first_batch) == 1
+    assert len(second_batch) == 1
+
+    assert first_batch[0].measured_time == replay_start
+    assert second_batch[0].measured_time == replay_start + timedelta(minutes=5)
+    assert first_batch[0].sensor_value == 10
+    assert second_batch[0].sensor_value == 20
 
 
-def test_fetch_round_robin_between_stations(tmp_path: Path) -> None:
+def test_fetch_returns_events_from_all_stations_in_one_call(tmp_path: Path) -> None:
     csv_1 = tmp_path / "station_1.csv"
     csv_2 = tmp_path / "station_2.csv"
 
@@ -199,38 +200,82 @@ def test_fetch_round_robin_between_stations(tmp_path: Path) -> None:
         ],
     )
 
+    replay_start = datetime(2026, 4, 22, 12, 0, tzinfo=timezone.utc)
     source = DigitrafficHistoryReplaySource(
-        replay_start=datetime(2026, 4, 22, 12, 0, tzinfo=timezone.utc),
+        replay_start=replay_start,
         csv_paths={1: csv_1, 2: csv_2},
     )
 
-    e1 = source.fetch()
-    e2 = source.fetch()
-    e3 = source.fetch()
-    e4 = source.fetch()
-    e5 = source.fetch()
+    batch_1 = source.fetch()
+    batch_2 = source.fetch()
+    batch_3 = source.fetch()
 
-    assert e1 is not None and e1.station_id == 1 and e1.sensor_value == 10
-    assert e2 is not None and e2.station_id == 2 and e2.sensor_value == 20
-    assert e3 is not None and e3.station_id == 1 and e3.sensor_value == 11
-    assert e4 is not None and e4.station_id == 2 and e4.sensor_value == 21
-    assert e5 is None
+    assert batch_1 == [
+        DigitrafficTrafficFlowHourlySensor(
+            station_id=1,
+            sensor_value=10,
+            measured_time=replay_start,
+            unit="veh/h",
+        ),
+        DigitrafficTrafficFlowHourlySensor(
+            station_id=2,
+            sensor_value=20,
+            measured_time=replay_start,
+            unit="veh/h",
+        ),
+    ]
+
+    assert batch_2 == [
+        DigitrafficTrafficFlowHourlySensor(
+            station_id=1,
+            sensor_value=11,
+            measured_time=replay_start + timedelta(minutes=1),
+            unit="veh/h",
+        ),
+        DigitrafficTrafficFlowHourlySensor(
+            station_id=2,
+            sensor_value=21,
+            measured_time=replay_start + timedelta(minutes=1),
+            unit="veh/h",
+        ),
+    ]
+
+    assert batch_3 == []
 
 
-def test_fetch_returns_none_when_all_files_exhausted(tmp_path: Path) -> None:
-    csv_path = tmp_path / "station.csv"
+def test_fetch_skips_exhausted_station_and_returns_remaining_events(tmp_path: Path) -> None:
+    csv_1 = tmp_path / "station_1.csv"
+    csv_2 = tmp_path / "station_2.csv"
+
     write_csv(
-        csv_path,
+        csv_1,
         [
             "timestamp,value",
-            "2022-01-01T00:01:37+00:00,4",
+            "2022-01-01T00:00:00+00:00,10",
+        ],
+    )
+    write_csv(
+        csv_2,
+        [
+            "timestamp,value",
+            "2022-01-01T00:00:30+00:00,20",
+            "2022-01-01T00:01:30+00:00,21",
         ],
     )
 
     source = DigitrafficHistoryReplaySource(
         replay_start=datetime(2026, 4, 22, 12, 0, tzinfo=timezone.utc),
-        csv_paths={1: csv_path},
+        csv_paths={1: csv_1, 2: csv_2},
     )
 
-    assert source.fetch() is not None
-    assert source.fetch() is None
+    batch_1 = source.fetch()
+    batch_2 = source.fetch()
+    batch_3 = source.fetch()
+
+    assert [event.station_id for event in batch_1] == [1, 2]
+    assert [event.sensor_value for event in batch_1] == [10, 20]
+
+    assert [event.station_id for event in batch_2] == [2]
+    assert [event.sensor_value for event in batch_2] == [21]
+
+    assert batch_3 == []

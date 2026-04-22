@@ -3,14 +3,15 @@ import time
 from deduplicator import InMemoryDeduplicator
 from publisher.stdout import StdoutPublisher
 from runner import IngestionRunner
-from sources.digitraffic import DigitrafficSource
+from sources.digitraffic import DigitrafficHistoryReplaySource
 from transformers.digitraffic import DigitrafficTransformer
 from settings import settings
+from datetime import datetime
 
 
 def main() -> None:
     runner = IngestionRunner(
-        source=DigitrafficSource(station_ids=settings.digitraffic_stations_ids),
+        source=DigitrafficHistoryReplaySource(replay_start=datetime.now(), csv_paths=settings.digitraffic_sources),
         transformer=DigitrafficTransformer(),
         publisher=StdoutPublisher(),
         deduplicator=InMemoryDeduplicator(),

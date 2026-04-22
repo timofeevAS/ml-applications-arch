@@ -6,7 +6,7 @@ from typing import TextIO
 import requests
 from datetime import datetime
 
-from .base import Source
+from sources.base import Source
 
 
 @dataclass(slots=True)
@@ -183,22 +183,13 @@ class DigitrafficHistoryReplaySource(Source):
             event.measured_time = self._shift_timestamp(state, event.measured_time)
             return event
 
-    def fetch(self) -> DigitrafficTrafficFlowHourlySensor | None:
-        if not self._station_order:
-            return None
+    def fetch(self) -> list[DigitrafficTrafficFlowHourlySensor]:
+        events: list[DigitrafficTrafficFlowHourlySensor] = []
 
-        checked_states = 0
-        total_states = len(self._station_order)
-
-        while checked_states < total_states:
-            station_id = self._station_order[self._next_station_idx]
+        for station_id in self._station_order:
             state = self._states[station_id]
-
-            self._next_station_idx = (self._next_station_idx + 1) % total_states
-            checked_states += 1
-
             event = self._fetch_from_state(state)
             if event is not None:
-                return event
+                events.append(event)
 
-        return None
+        return events
