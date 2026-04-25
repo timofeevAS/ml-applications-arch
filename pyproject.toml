@@ -13,7 +13,6 @@ exclude = [
 select = [
     "E", # style errors
     "F", # unused imports
-    "I", # import sorting
     "UP", # modern python syntax
 ]
 ignore = []
