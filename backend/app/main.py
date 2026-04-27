@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from app.api.router import router as api_router
 
 # NOTE: to run this application in basic way use:
-#  uvicorn app.main:app --reload 
+#  uvicorn app.main:app --reload
 #
 #  pwd: /ml-applications-arch/backend/...
 app = FastAPI(
