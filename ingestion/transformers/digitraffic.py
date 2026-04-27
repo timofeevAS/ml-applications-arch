@@ -1,4 +1,5 @@
 from sources.digitraffic import DigitrafficTrafficFlowHourlySensor
+
 from transformers.base import Measurment, Transformer
 
 
@@ -14,7 +15,7 @@ class DigitrafficTransformer(Transformer):
                     "unit" : sv.unit
                     }
                 )
-            
+
             result.append(measurment)
-        
+
         return result

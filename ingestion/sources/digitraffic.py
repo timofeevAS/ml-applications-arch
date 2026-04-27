@@ -1,10 +1,10 @@
-from dataclasses import dataclass
-from pathlib import Path
 import re
+from dataclasses import dataclass
+from datetime import datetime
+from pathlib import Path
 from typing import TextIO
 
 import requests
-from datetime import datetime
 
 from sources.base import Source
 
@@ -28,7 +28,7 @@ class DigitrafficSource(Source):
         for station_id in self.station_ids:
             url = f"https://tie.digitraffic.fi/api/tms/v1/stations/{station_id}/data"
             raw_data = requests.get(url).json()
-            
+
             # There is average number of vehicle per hour screening with '5-minute window'.
             pattern = re.compile(r"OHITUKSET_5MIN_KIINTEA_KAISTA\d+")
 
@@ -47,13 +47,13 @@ class DigitrafficSource(Source):
             hourly_flow = 0
             for sv in sensor_values:
                 hourly_flow += sv["value"]
-                
+
             data.append(DigitrafficTrafficFlowHourlySensor(
-                station_id=station_id, 
+                station_id=station_id,
                 sensor_value=hourly_flow,
                 measured_time=sensor_values[0]['measuredTime'],
                 unit=sensor_values[0]['unit']))
-        
+
         return data
 
 @dataclass

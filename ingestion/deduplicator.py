@@ -5,6 +5,7 @@ from dataclasses import dataclass, field
 
 from transformers.base import Measurment
 
+
 class Deduplicator(ABC):
     def is_new(self, measurement: Measurment) -> bool:
         pass
@@ -22,6 +23,6 @@ class InMemoryDeduplicator(Deduplicator):
 
         self.seen_keys.add(key)
         return True
-    
+
     def clear(self) -> None:
         self.seen_keys.clear()

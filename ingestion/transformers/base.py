@@ -3,6 +3,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Any
 
+
 class Transformer(ABC):
     @abstractmethod
     def transform(self) -> dict:

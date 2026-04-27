@@ -1,5 +1,8 @@
 from __future__ import annotations
+
 import json
+from datetime import UTC, datetime, timedelta
+from pathlib import Path
 
 import pytest
 from publisher.stdout import StdoutPublisher
@@ -7,10 +10,6 @@ from sources.digitraffic import DigitrafficHistoryReplaySource, DigitrafficSourc
 from transformers.base import Measurment
 from transformers.digitraffic import DigitrafficTransformer
 
-from datetime import datetime, timedelta, timezone
-from pathlib import Path
-
-import pytest
 
 @pytest.mark.parametrize(
     "station_ids, expected_len",
@@ -35,13 +34,13 @@ def test_digitraffic_transform():
             DigitrafficTrafficFlowHourlySensor(
                 station_id=20002,
                 sensor_value=312,
-                measured_time='2026-04-10T20:52:03Z', 
+                measured_time='2026-04-10T20:52:03Z',
                 unit='kpl/h'),
             DigitrafficTrafficFlowHourlySensor(
                 station_id=23001,
                 sensor_value=32,
-                measured_time='2026-04-10T20:52:03Z', 
-                unit='kpl/h')   
+                measured_time='2026-04-10T20:52:03Z',
+                unit='kpl/h')
         ]
         )
 
@@ -91,14 +90,14 @@ def test_digitraffic_stddout_publisher(capsys):
     assert output["value_metadata"]["unit"] == "kpl/h"
     assert output["value_metadata"]["time_window_start"] == "2026-04-10T20:45:00Z"
     assert output["value_metadata"]["time_window_end"] == "2026-04-10T20:50:00Z"
-    
-    
+
+
 def write_csv(path: Path, lines: list[str]) -> None:
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 def test_init_raises_when_csv_paths_empty() -> None:
     with pytest.raises(ValueError, match="csv_paths"):
         DigitrafficHistoryReplaySource(
-            replay_start=datetime(2026, 4, 22, 12, 0, tzinfo=timezone.utc),
+            replay_start=datetime(2026, 4, 22, 12, 0, tzinfo=UTC),
             csv_paths={},
         )
 
@@ -108,7 +107,7 @@ def test_parse_raw_line_returns_sensor(tmp_path: Path) -> None:
     write_csv(csv_path, ["timestamp,value"])
 
     source = DigitrafficHistoryReplaySource(
-        replay_start=datetime(2026, 4, 22, 12, 0, tzinfo=timezone.utc),
+        replay_start=datetime(2026, 4, 22, 12, 0, tzinfo=UTC),
         csv_paths={1: csv_path},
     )
 
@@ -117,7 +116,7 @@ def test_parse_raw_line_returns_sensor(tmp_path: Path) -> None:
     assert event == DigitrafficTrafficFlowHourlySensor(
         station_id=1,
         sensor_value=4,
-        measured_time=datetime(2022, 1, 1, 0, 1, 37, tzinfo=timezone.utc),
+        measured_time=datetime(2022, 1, 1, 0, 1, 37, tzinfo=UTC),
         unit="veh/h",
     )
 
@@ -132,7 +131,7 @@ def test_fetch_returns_batch_for_single_station(tmp_path: Path) -> None:
         ],
     )
 
-    replay_start = datetime(2026, 4, 22, 12, 0, tzinfo=timezone.utc)
+    replay_start = datetime(2026, 4, 22, 12, 0, tzinfo=UTC)
     source = DigitrafficHistoryReplaySource(
         replay_start=replay_start,
         csv_paths={1: csv_path},
@@ -161,7 +160,7 @@ def test_fetch_preserves_relative_time_offset_between_calls(tmp_path: Path) -> N
         ],
     )
 
-    replay_start = datetime(2026, 4, 22, 12, 0, tzinfo=timezone.utc)
+    replay_start = datetime(2026, 4, 22, 12, 0, tzinfo=UTC)
     source = DigitrafficHistoryReplaySource(
         replay_start=replay_start,
         csv_paths={1: csv_path},
@@ -200,7 +199,7 @@ def test_fetch_returns_events_from_all_stations_in_one_call(tmp_path: Path) -> N
         ],
     )
 
-    replay_start = datetime(2026, 4, 22, 12, 0, tzinfo=timezone.utc)
+    replay_start = datetime(2026, 4, 22, 12, 0, tzinfo=UTC)
     source = DigitrafficHistoryReplaySource(
         replay_start=replay_start,
         csv_paths={1: csv_1, 2: csv_2},
@@ -264,7 +263,7 @@ def test_fetch_skips_exhausted_station_and_returns_remaining_events(tmp_path: Pa
     )
 
     source = DigitrafficHistoryReplaySource(
-        replay_start=datetime(2026, 4, 22, 12, 0, tzinfo=timezone.utc),
+        replay_start=datetime(2026, 4, 22, 12, 0, tzinfo=UTC),
         csv_paths={1: csv_1, 2: csv_2},
     )
 

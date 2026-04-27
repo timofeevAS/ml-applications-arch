@@ -1,5 +1,6 @@
 from runner import IngestionRunner
 
+
 class FakeSource:
     def __init__(self, data: list[str]):
         self.fake_data = data
