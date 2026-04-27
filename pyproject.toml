@@ -18,5 +18,6 @@ select = [
     "W", # style warnings: trailing whitespace, no newline at EOF
     "RET", # return: RET503 explicit return None
     "ARG", # unused args
+    "SIM", # simplify
 ]
 ignore = []
