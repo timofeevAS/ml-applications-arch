@@ -16,5 +16,6 @@ select = [
     "F", # unused imports
     "UP", # modern python syntax
     "W", # style warnings: trailing whitespace, no newline at EOF
+    "RET", # return: RET503 explicit return None
 ]
 ignore = []
