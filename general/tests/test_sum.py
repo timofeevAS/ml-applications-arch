@@ -1,5 +1,6 @@
 from general.sum import sum
 
+
 def test_positive_numbers():
     assert sum(1, 1) == 2
 
