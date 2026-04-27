@@ -15,5 +15,6 @@ select = [
     "I", # isort: import sorting (I001, I002)
     "F", # unused imports
     "UP", # modern python syntax
+    "W", # style warnings: trailing whitespace, no newline at EOF
 ]
 ignore = []
