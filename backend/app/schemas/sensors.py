@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+
 '''
 id      — номер датчика
 name    — название для интерфейса
