@@ -14,9 +14,24 @@ def test_get_sensors():
     assert isinstance(data, list)
     assert len(data) == 3
 
-    sensor = data[0]
+    assert data == [
+        {
+            "id": 1,
+            "name": "Датчик 1",
+            "metric": "vehicle_count_last_hour",
+            "unit": "vehicles",
+        },
+        {
+            "id": 2,
+            "name": "Датчик 2",
+            "metric": "vehicle_count_last_hour",
+            "unit": "vehicles",
+        },
+        {
+            "id": 3,
+            "name": "Датчик 3",
+            "metric": "vehicle_count_last_hour",
+            "unit": "vehicles",
+        },
+    ]
 
-    assert sensor["id"] == 1
-    assert sensor["name"] == "Датчик 1"
-    assert sensor["metric"] == "vehicle_count_last_hour"
-    assert sensor["unit"] == "vehicles"
