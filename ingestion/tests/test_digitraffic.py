@@ -34,13 +34,13 @@ def test_digitraffic_transform():
             DigitrafficTrafficFlowHourlySensor(
                 station_id=20002,
                 sensor_value=312,
-                measured_time='2026-04-10T20:52:03Z',
-                unit='kpl/h'),
+                measured_time="2026-04-10T20:52:03Z",
+                unit="kpl/h"),
             DigitrafficTrafficFlowHourlySensor(
                 station_id=23001,
                 sensor_value=32,
-                measured_time='2026-04-10T20:52:03Z',
-                unit='kpl/h')
+                measured_time="2026-04-10T20:52:03Z",
+                unit="kpl/h")
         ]
         )
 

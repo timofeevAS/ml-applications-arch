@@ -40,8 +40,8 @@ class DigitrafficSource(Source):
             # total veh/h:   46
             sensor_values = [
                 row
-                for row in raw_data['sensorValues']
-                if pattern.fullmatch(row['name'])
+                for row in raw_data["sensorValues"]
+                if pattern.fullmatch(row["name"])
             ]
 
             hourly_flow = 0
@@ -51,8 +51,8 @@ class DigitrafficSource(Source):
             data.append(DigitrafficTrafficFlowHourlySensor(
                 station_id=station_id,
                 sensor_value=hourly_flow,
-                measured_time=sensor_values[0]['measuredTime'],
-                unit=sensor_values[0]['unit']))
+                measured_time=sensor_values[0]["measuredTime"],
+                unit=sensor_values[0]["unit"]))
 
         return data
 

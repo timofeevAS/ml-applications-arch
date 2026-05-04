@@ -19,5 +19,15 @@ select = [
     "RET", # return: RET503 explicit return None
     "ARG", # unused args
     "SIM", # simplify
+    "Q", # using rules for quotes.
 ]
+
 ignore = []
+
+[tool.ruff.lint.flake8-quotes]
+inline-quotes = "double"
+multiline-quotes = "double"
+docstring-quotes = "double"
+
+[tool.ruff.format]
+quote-style = "double"
