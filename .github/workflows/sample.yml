@@ -71,3 +71,26 @@ jobs:
       - name: Run tests
         working-directory: backend
         run: python -m pytest tests/
+
+  ingestion-tests:
+    needs: lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install requirements
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r ingestion/requirements.txt
+          pip install pytest
+
+      - name: Run tests
+        working-directory: ingestion
+        run: python -m pytest tests/
